@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor — AquiAds</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body { overflow: hidden; }
+    .editor-layout { display: grid; grid-template-rows: 58px 1fr; grid-template-columns: 260px 1fr 280px; height: 100vh; }
+    .editor-topbar  { grid-column: 1 / -1; grid-row: 1; }
+    .panel-left     { grid-column: 1; grid-row: 2; }
+    .editor-center  { grid-column: 2; grid-row: 2; display:flex; flex-direction:column; }
+    .panel-right    { grid-column: 3; grid-row: 2; }
+
+    .panel-tabs { display:flex; gap:0; border-bottom:1px solid var(--color-gray-light); }
+    .panel-tab  { flex:1; padding:9px 4px; font-size:0.78rem; font-weight:500; color:var(--color-text-muted); background:none; border:none; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:var(--transition); }
+    .panel-tab:hover { color:var(--color-text); }
+    .panel-tab.tab-btn--active { color:var(--color-primary); border-bottom-color:var(--color-primary); font-weight:600; }
+    .panel-tab-content { display:none; }
+    .panel-tab-content.tab-content--active { display:block; }
+
+    .prop-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+    .prop-label { font-size:0.78rem; color:var(--color-text-muted); font-weight:500; white-space:nowrap; }
+    .prop-input { height:32px; padding:0 8px; border:1.5px solid var(--color-gray-light); border-radius:var(--radius-sm); font-size:0.8125rem; flex:1; min-width:0; }
+    .prop-input:focus { outline:none; border-color:var(--color-primary); }
+    .prop-color  { height:32px; width:44px; padding:2px; border:1.5px solid var(--color-gray-light); border-radius:var(--radius-sm); cursor:pointer; }
+    .prop-select { height:32px; padding:0 6px; border:1.5px solid var(--color-gray-light); border-radius:var(--radius-sm); font-size:0.8rem; background:#fff; flex:1; min-width:0; }
+
+    .specs-badge { background:rgba(255,107,0,0.06); border:1px solid rgba(255,107,0,0.2); border-radius:var(--radius-md); padding:10px 12px; }
+    .specs-row { display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:5px; }
+    .specs-row:last-child { margin-bottom:0; }
+    .specs-label { color:var(--color-text-muted); }
+    .specs-value { font-weight:600; color:var(--color-text); }
+
+    @media(max-width:900px) {
+      .editor-layout { grid-template-columns: 220px 1fr; }
+      .panel-right   { display:none; }
+    }
+    @media(max-width:700px) {
+      .editor-layout { grid-template-columns: 1fr; grid-template-rows: 58px 1fr; }
+      .panel-left    { display:none; }
+    }
+  </style>
+</head>
+<body class="editor-page">
+<div id="toast-container"></div>
+
+<div class="editor-layout">
+  <!-- TOP BAR -->
+  <header class="editor-topbar">
+    <a href="dashboard.html" class="btn btn--ghost btn--sm" style="gap:6px;" data-tooltip="Voltar ao painel">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/></svg>
+      Painel
+    </a>
+    <div class="editor-divider"></div>
+    <input type="text" class="creative-name-input" id="creative-name" value="Novo Criativo" maxlength="60" title="Clique para editar o nome">
+    <div class="editor-divider"></div>
+    <select class="format-select-small" id="format-selector" data-tooltip="Alterar formato"></select>
+    <div class="editor-divider"></div>
+    <div class="editor-toolbar-group">
+      <button class="toolbar-btn" id="btn-undo" title="Desfazer (Ctrl+Z)" data-tooltip="Desfazer">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 3a5 5 0 10.536 9.978 1 1 0 01.144 1.996A7 7 0 118 3z"/><path d="M7.293 3.293a1 1 0 011.414 0L10.414 5H5a1 1 0 110-2h5.414L7.293.293a1 1 0 010-1.414z"/></svg>
+      </button>
+      <button class="toolbar-btn" id="btn-redo" title="Refazer (Ctrl+Y)" data-tooltip="Refazer">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12 3a5 5 0 11-.536 9.978 1 1 0 00-.144 1.996A7 7 0 1112 3z"/><path d="M12.707 3.293a1 1 0 00-1.414 0L9.586 5H15a1 1 0 110 2H9.586l2.707 2.707a1 1 0 010 1.414 1 1 0 001.414 0l3-3a1 1 0 000-1.414l-3-3z"/></svg>
+      </button>
+    </div>
+    <div class="editor-divider"></div>
+    <!-- Safe zone toggle -->
+    <label class="safe-zone-toggle-label" data-tooltip="Mostrar/ocultar zona segura">
+      <input type="checkbox" id="safe-zone-toggle" checked style="accent-color:var(--color-primary);">
+      Zona segura
+    </label>
+    <div style="flex:1;"></div>
+    <!-- Quality badge -->
+    <div class="quality-badge" id="quality-badge" data-tooltip="Score de qualidade do criativo">
+      <strong style="color:var(--color-gray-mid)">—</strong><span>/100</span>
+    </div>
+    <div class="editor-divider"></div>
+    <button class="toolbar-btn" data-tooltip="Exportar PNG" data-export="png" title="Exportar PNG">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/></svg>
+    </button>
+    <button class="btn btn--ghost btn--sm" id="btn-save" data-tooltip="Salvar rascunho">Salvar</button>
+    <button class="btn btn--primary btn--sm" id="btn-submit" data-tooltip="Enviar para aprovação">Enviar ↗</button>
+  </header>
+
+  <!-- LEFT PANEL -->
+  <aside class="editor-panel panel-left">
+    <div style="border-bottom:1px solid var(--color-gray-light);">
+      <div class="panel-tabs">
+        <button class="panel-tab tab-btn--active" data-tab="elements">Elementos</button>
+        <button class="panel-tab" data-tab="text">Texto</button>
+        <button class="panel-tab" data-tab="image">Imagem</button>
+        <button class="panel-tab" data-tab="bg">Fundo</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px;">
+      <!-- ELEMENTS TAB -->
+      <div class="panel-tab-content tab-content--active" id="tab-elements">
+        <div class="panel-section-title">Adicionar elemento</div>
+        <div class="elements-grid">
+          <button class="element-btn" data-type="text" data-tooltip="Texto">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M2.5 4.5A.5.5 0 013 4h14a.5.5 0 010 1H11v11.5a.5.5 0 01-1 0V5H3a.5.5 0 01-.5-.5z"/></svg>
+            Texto
+          </button>
+          <button class="element-btn" data-type="rect" data-tooltip="Retângulo">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><rect x="2" y="5" width="16" height="10" rx="2"/></svg>
+            Forma
+          </button>
+          <button class="element-btn" data-type="circle" data-tooltip="Círculo">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><circle cx="10" cy="10" r="7"/></svg>
+            Círculo
+          </button>
+          <button class="element-btn" data-type="logo" data-tooltip="Logo placeholder">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M10 2l2.582 5.236L18 8.236l-4 3.9.944 5.5L10 15.236 5.056 17.636.944 12.136l-4-3.9 5.418-.982z"/></svg>
+            Logo
+          </button>
+          <button class="element-btn" data-type="line" data-tooltip="Linha">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M3 10h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Linha
+          </button>
+          <button class="element-btn" data-type="image" data-tooltip="Imagem">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/></svg>
+            Imagem
+          </button>
+        </div>
+        <div class="divider"></div>
+        <div class="panel-section-title">Cores rápidas</div>
+        <div class="color-swatches">
+          <div class="color-swatch" data-color="#FF6B00" style="background:#FF6B00;" data-tooltip="#FF6B00 Laranja"></div>
+          <div class="color-swatch" data-color="#1A1A1A" style="background:#1A1A1A;" data-tooltip="#1A1A1A Preto"></div>
+          <div class="color-swatch" data-color="#FFFFFF" style="background:#fff;border:1.5px solid #E5E5E5;" data-tooltip="Branco"></div>
+          <div class="color-swatch" data-color="#22C55E" style="background:#22C55E;" data-tooltip="Verde"></div>
+          <div class="color-swatch" data-color="#3B82F6" style="background:#3B82F6;" data-tooltip="Azul"></div>
+          <div class="color-swatch" data-color="#EF4444" style="background:#EF4444;" data-tooltip="Vermelho"></div>
+          <div class="color-swatch" data-color="#F59E0B" style="background:#F59E0B;" data-tooltip="Amarelo"></div>
+          <div class="color-swatch" data-color="#6B7280" style="background:#6B7280;" data-tooltip="Cinza"></div>
+        </div>
+        <div class="divider"></div>
+        <button class="btn btn--danger btn--sm w-full" id="btn-delete-selected" data-tooltip="Excluir elemento selecionado">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"/></svg>
+          Excluir selecionado
+        </button>
+      </div>
+
+      <!-- TEXT TAB -->
+      <div class="panel-tab-content" id="tab-text">
+        <div class="panel-section-title">Propriedades de texto</div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label class="form-label" style="font-size:0.78rem;">Fonte</label>
+          <select class="prop-select" id="font-family-sel">
+            <option value="Inter, sans-serif">Inter</option>
+            <option value="Roboto, sans-serif">Roboto</option>
+            <option value="Montserrat, sans-serif">Montserrat</option>
+            <option value="Playfair Display, serif">Playfair Display</option>
+            <option value="Oswald, sans-serif">Oswald</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="Arial, sans-serif">Arial</option>
+          </select>
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">Tamanho</span>
+          <input type="number" class="prop-input" id="font-size-input" value="18" min="6" max="200" style="width:70px;flex:none;">
+          <span style="font-size:0.75rem;color:var(--color-text-muted);">px</span>
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">Cor do texto</span>
+          <input type="color" class="prop-color" id="text-color-input" value="#1A1A1A">
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">Alinhamento</span>
+          <select class="prop-select" id="text-align-sel" style="width:100px;flex:none;">
+            <option value="left">Esq.</option>
+            <option value="center">Centro</option>
+            <option value="right">Dir.</option>
+          </select>
+        </div>
+        <div class="prop-row">
+          <span class="prop-label">Estilo</span>
+          <div style="display:flex;gap:4px;">
+            <button class="toolbar-btn" id="btn-bold" data-tooltip="Negrito" style="border:1.5px solid var(--color-gray-light);border-radius:4px;"><strong>B</strong></button>
+            <button class="toolbar-btn" id="btn-italic" data-tooltip="Itálico" style="border:1.5px solid var(--color-gray-light);border-radius:4px;"><em>I</em></button>
+          </div>
+        </div>
+        <div style="font-size:0.78rem;color:var(--color-text-muted);margin-top:6px;line-height:1.5;">
+          💡 Dica: dê dois cliques no texto no canvas para editá-lo diretamente.
+        </div>
+      </div>
+
+      <!-- IMAGE TAB -->
+      <div class="panel-tab-content" id="tab-image">
+        <div class="panel-section-title">Imagem / Logo</div>
+        <input type="file" id="image-upload-input" accept="image/*" style="display:none;">
+        <button class="btn btn--primary w-full" id="image-upload-btn">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"/></svg>
+          Fazer Upload de Imagem
+        </button>
+        <p style="font-size:0.78rem;color:var(--color-text-muted);margin-top:8px;line-height:1.5;">
+          Formatos: JPG, PNG, GIF<br>Tamanho máximo: 10MB
+        </p>
+        <div class="divider"></div>
+        <div class="panel-section-title">Dicas</div>
+        <ul style="font-size:0.8rem;color:var(--color-text-muted);line-height:1.7;padding-left:16px;">
+          <li>Use imagens de alta resolução</li>
+          <li>Prefira PNG para logos com fundo transparente</li>
+          <li>Evite imagens com texto embutido</li>
+        </ul>
+      </div>
+
+      <!-- BACKGROUND TAB -->
+      <div class="panel-tab-content" id="tab-bg">
+        <div class="panel-section-title">Cor de fundo</div>
+        <div class="prop-row">
+          <span class="prop-label">Cor</span>
+          <input type="color" class="prop-color" id="bg-color-input" value="#FFFFFF">
+        </div>
+        <div class="divider"></div>
+        <div class="panel-section-title">Cores predefinidas</div>
+        <div class="color-swatches" style="margin-bottom:12px;">
+          <div class="color-swatch" style="background:#FFFFFF;border:1.5px solid #E5E5E5;" onclick="setBg('#FFFFFF')"></div>
+          <div class="color-swatch" style="background:#1A1A1A;" onclick="setBg('#1A1A1A')"></div>
+          <div class="color-swatch" style="background:#FF6B00;" onclick="setBg('#FF6B00')"></div>
+          <div class="color-swatch" style="background:#3B82F6;" onclick="setBg('#3B82F6')"></div>
+          <div class="color-swatch" style="background:#22C55E;" onclick="setBg('#22C55E')"></div>
+          <div class="color-swatch" style="background:#F5F5F5;border:1px solid #E5E5E5;" onclick="setBg('#F5F5F5')"></div>
+          <div class="color-swatch" style="background:#0F0C29;" onclick="setBg('#0F0C29')"></div>
+          <div class="color-swatch" style="background:#764ba2;" onclick="setBg('#764ba2')"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER CANVAS AREA -->
+  <section class="editor-center">
+    <div class="editor-toolbar">
+      <div class="editor-toolbar-group">
+        <span style="font-size:0.8rem;color:var(--color-text-muted);" id="format-display">—</span>
+      </div>
+      <div style="flex:1;"></div>
+      <div class="editor-toolbar-group">
+        <button class="toolbar-btn" data-export="png" data-tooltip="Exportar PNG" title="PNG">PNG</button>
+        <button class="toolbar-btn" data-export="jpg" data-tooltip="Exportar JPG" title="JPG">JPG</button>
+      </div>
+    </div>
+
+    <div class="canvas-viewport" id="canvas-viewport">
+      <div class="canvas-wrapper" id="canvas-wrapper">
+        <canvas id="bg-canvas" class="canvas-bg"></canvas>
+        <div id="canvas-stage" class="canvas-stage">
+          <div id="safe-zone-overlay" class="safe-zone-overlay"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VALIDATION STRIP -->
+    <div class="validation-strip" id="validation-strip">
+      <span style="font-size:0.78rem;color:var(--color-text-muted);">Adicione elementos para ver a validação em tempo real.</span>
+    </div>
+  </section>
+
+  <!-- RIGHT PANEL — Layers + Specs -->
+  <aside class="editor-panel editor-panel-right panel-right">
+    <div style="border-bottom:1px solid var(--color-gray-light);">
+      <div class="panel-tabs">
+        <button class="panel-tab tab-btn--active" data-tab="layers">Camadas</button>
+        <button class="panel-tab" data-tab="score">Score</button>
+        <button class="panel-tab" data-tab="specs">Specs</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:12px;">
+      <!-- LAYERS TAB -->
+      <div class="panel-tab-content tab-content--active" id="tab-layers">
+        <div id="layers-list" style="min-height:60px;"></div>
+      </div>
+      <!-- SCORE TAB -->
+      <div class="panel-tab-content" id="tab-score">
+        <div class="score-panel">
+          <div class="score-header">
+            <div>
+              <div class="score-big score-big--f" id="score-big">—</div>
+              <div class="score-grade" id="score-grade">Adicione elementos</div>
+            </div>
+            <div id="score-ring-container"></div>
+          </div>
+          <div class="score-checks" id="score-checks"></div>
+        </div>
+      </div>
+      <!-- SPECS TAB -->
+      <div class="panel-tab-content" id="tab-specs">
+        <div class="specs-badge" id="format-specs">
+          <div style="font-size:0.8rem;color:var(--color-text-muted);">Selecione um formato</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- AI MODAL -->
+<div class="modal-overlay" id="ai-modal-overlay">
+  <div class="modal" id="ai-modal">
+    <div class="modal-header">
+      <div>
+        <h3>✨ Melhorar com IA</h3>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);margin-top:4px;">Sugestões automáticas para melhorar a qualidade do seu criativo.</p>
+      </div>
+      <button class="modal-close" id="ai-modal-close">✕</button>
+    </div>
+    <div id="ai-score-improvement"></div>
+    <div id="ai-suggestions-list"></div>
+    <div class="modal-footer">
+      <button class="btn btn--ghost" id="ai-cancel-btn">Cancelar</button>
+      <button class="btn btn--secondary" id="ai-apply-btn">Aplicar Selecionadas</button>
+      <button class="btn btn--primary"   id="ai-apply-all-btn">Aplicar Todas</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMIT MODAL -->
+<div class="modal-overlay" id="submit-modal-overlay">
+  <div class="modal modal--lg">
+    <div class="modal-header">
+      <div>
+        <h3>Enviar para Aprovação</h3>
+        <p style="font-size:0.85rem;color:var(--color-text-muted);margin-top:4px;">Verifique o checklist e preencha os dados da campanha.</p>
+      </div>
+      <button class="modal-close" id="submit-close-btn">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div>
+        <div style="font-size:0.8rem;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">Checklist de qualidade</div>
+        <div class="checklist" id="submit-checklist"></div>
+      </div>
+      <div>
+        <div style="font-size:0.8rem;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">Dados da campanha</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Nome da campanha</label>
+            <input type="text" class="form-input" id="campaign-name" placeholder="Ex: Promoção de Verão">
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Início</label>
+              <input type="date" class="form-input" id="campaign-start">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Término</label>
+              <input type="date" class="form-input" id="campaign-end">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Observações</label>
+            <textarea class="form-textarea" id="campaign-notes" rows="3" placeholder="Informações adicionais…"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn--ghost" id="submit-close-btn2" onclick="document.getElementById('submit-modal-overlay').classList.remove('modal-overlay--open')">Cancelar</button>
+      <button class="btn btn--primary" id="submit-confirm-btn">Confirmar Envio ↗</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI FAB -->
+<button class="ai-fab" id="ai-fab" data-tooltip="Melhorar com IA">
+  <span class="ai-fab-label">Melhorar com IA</span>
+  ✨
+</button>
+
+<script src="assets/js/app.js"></script>
+<script src="assets/js/validator.js"></script>
+<script src="assets/js/ai-helper.js"></script>
+<script src="assets/js/editor.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
+
+<script>
+// Right panel tabs
+document.querySelectorAll('.panel-tab[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const panel = btn.closest('.editor-panel, .panel-right');
+    panel.querySelectorAll('.panel-tab').forEach(b => b.classList.remove('tab-btn--active'));
+    panel.querySelectorAll('.panel-tab-content').forEach(c => c.classList.remove('tab-content--active'));
+    btn.classList.add('tab-btn--active');
+    const target = document.getElementById('tab-' + btn.dataset.tab);
+    if (target) target.classList.add('tab-content--active');
+  });
+});
+
+function setBg(color) {
+  document.getElementById('bg-color-input').value = color;
+  document.getElementById('bg-color-input').dispatchEvent(new Event('input'));
+}
+
+// Patch validator to also update right panel score
+const _origRenderResults = AquiAds.Validator.renderResults.bind(AquiAds.Validator);
+AquiAds.Validator.renderResults = function(results, stripEl, badgeEl) {
+  _origRenderResults(results, stripEl, badgeEl);
+  // Update score panel
+  const scoreBig  = document.getElementById('score-big');
+  const scoreGrade = document.getElementById('score-grade');
+  const scoreChecks = document.getElementById('score-checks');
+  const scoreRingContainer = document.getElementById('score-ring-container');
+  if (scoreBig) {
+    scoreBig.textContent = results.score;
+    scoreBig.className   = 'score-big score-big--' + results.grade.toLowerCase();
+  }
+  if (scoreGrade) scoreGrade.textContent = 'Nota ' + results.grade;
+  if (scoreRingContainer) AquiAds.Utils.renderScoreRing(results.score, scoreRingContainer);
+  if (scoreChecks) {
+    scoreChecks.innerHTML = results.checks.map(c => `
+      <div class="score-check-item">
+        <div class="score-check-icon score-check-icon--${c.status}">
+          ${c.status==='pass'?'✓':c.status==='warn'?'!':'✕'}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div class="score-check-label">${c.label}</div>
+          <div class="score-check-msg">${c.message}</div>
+        </div>
+        <span class="badge badge--${c.status==='pass'?'green':c.status==='warn'?'yellow':'red'}" style="font-size:0.65rem;">${c.weight}pts</span>
+      </div>`).join('');
+  }
+  // Update specs panel
+  if (window.Editor && Editor.format) {
+    const fmt = Editor.format;
+    const specs = document.getElementById('format-specs');
+    const display = document.getElementById('format-display');
+    if (display) display.textContent = `${fmt.name} · ${fmt.width}×${fmt.height}px`;
+    if (specs) specs.innerHTML = `
+      <div style="font-weight:700;font-size:0.875rem;margin-bottom:10px;">${fmt.name}</div>
+      <div class="specs-row"><span class="specs-label">Dimensões</span><span class="specs-value">${fmt.width}×${fmt.height}px</span></div>
+      <div class="specs-row"><span class="specs-label">Categoria</span><span class="specs-value">${fmt.category}</span></div>
+      <div class="specs-row"><span class="specs-label">Resolução</span><span class="specs-value">${fmt.specs.res}</span></div>
+      <div class="specs-row"><span class="specs-label">Cores</span><span class="specs-value">${fmt.specs.color}</span></div>
+      <div class="specs-row"><span class="specs-label">Tamanho máx.</span><span class="specs-value">${fmt.specs.maxMB}MB</span></div>
+      <div class="specs-row"><span class="specs-label">Formatos</span><span class="specs-value">${fmt.specs.formats}</span></div>
+      <div class="specs-row"><span class="specs-label">Sangria</span><span class="specs-value">${fmt.specs.bleed||'0'}</span></div>
+      <div class="specs-row"><span class="specs-label">Zona segura</span><span class="specs-value">${Math.round(fmt.safeZoneMargin*100)}%</span></div>`;
+  }
+};
+
+// Modal overlay close on bg click
+document.getElementById('ai-modal-overlay').addEventListener('click', e => { if (e.target===e.currentTarget) AquiAds.AIHelper.closeModal(); });
+document.getElementById('submit-modal-overlay').addEventListener('click', e => { if (e.target===e.currentTarget) e.currentTarget.classList.remove('modal-overlay--open'); });
+</script>
+</body>
+</html>

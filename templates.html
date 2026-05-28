@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Templates — AquiAds</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .filters-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:6px; }
+    .format-filter { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:24px; }
+    .format-filter .filter-pill { font-size:0.78rem; padding:5px 12px; }
+    .template-preview { cursor:pointer; }
+  </style>
+</head>
+<body>
+<div id="toast-container"></div>
+
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="3" fill="white"/><path d="M6 14L10 6L14 14" stroke="#FF6B00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="sidebar-logo-text">Aqui<span>Ads</span></span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section"><div class="nav-section-label">Menu</div></div>
+      <a href="dashboard.html" class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg><span>Dashboard</span></a>
+      <a href="templates.html" class="nav-link nav-link--active"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 3h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/></svg><span>Templates</span></a>
+      <a href="editor.html"    class="nav-link"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg><span>Novo Criativo</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="user-avatar">U</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="user-name">Usuário</div>
+          <div class="sidebar-user-plan"><span class="badge badge--orange" style="font-size:0.65rem;padding:2px 7px;">Grátis</span></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <span class="topbar-title">Galeria de Templates</span>
+      <div class="topbar-actions">
+        <div class="search-input-wrap">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/></svg>
+          <input type="text" class="search-input" id="search-input" placeholder="Buscar templates…">
+        </div>
+        <a href="editor.html" class="btn btn--primary btn--sm">Editor em branco</a>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <p style="color:var(--color-text-muted);margin-bottom:20px;font-size:0.9375rem;">
+        Escolha um modelo pelo objetivo do seu anúncio e comece a personalizar imediatamente.
+      </p>
+
+      <!-- OBJECTIVE FILTER -->
+      <div class="filters-row" id="obj-filters">
+        <button class="filter-pill filter-pill--active" data-obj="all" onclick="filterObj(this)">Todos</button>
+        <button class="filter-pill" data-obj="awareness"  onclick="filterObj(this)">🎯 Awareness</button>
+        <button class="filter-pill" data-obj="trafego"    onclick="filterObj(this)">🚀 Tráfego</button>
+        <button class="filter-pill" data-obj="conversao"  onclick="filterObj(this)">💰 Conversão</button>
+        <button class="filter-pill" data-obj="promocao"   onclick="filterObj(this)">🏷️ Promoção</button>
+        <button class="filter-pill" data-obj="lancamento" onclick="filterObj(this)">🌟 Lançamento</button>
+      </div>
+
+      <!-- FORMAT FILTER -->
+      <div class="format-filter" id="fmt-filters">
+        <button class="filter-pill filter-pill--active" data-fmt="all"     onclick="filterFmt(this)">Todos formatos</button>
+        <button class="filter-pill" data-fmt="OOH"     onclick="filterFmt(this)">OOH</button>
+        <button class="filter-pill" data-fmt="Digital" onclick="filterFmt(this)">Digital</button>
+      </div>
+
+      <!-- GRID -->
+      <div class="templates-grid" id="templates-grid"></div>
+      <div id="templates-empty" class="empty-state" style="display:none;">
+        <div class="empty-state-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FF6B00" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+        <h3>Nenhum template encontrado</h3>
+        <p>Tente outro filtro ou busca.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="modal-overlay" id="preview-modal-overlay">
+  <div class="modal modal--lg">
+    <div class="modal-header">
+      <div>
+        <h3 id="preview-modal-title">Template</h3>
+        <div style="display:flex;gap:8px;margin-top:6px;" id="preview-modal-badges"></div>
+      </div>
+      <button class="modal-close" onclick="closePreview()">✕</button>
+    </div>
+    <div style="background:var(--color-bg);border-radius:var(--radius-md);padding:24px;margin-bottom:20px;display:flex;align-items:center;justify-content:center;min-height:200px;">
+      <div id="preview-modal-canvas" style="max-width:100%;"></div>
+    </div>
+    <p id="preview-modal-desc" style="font-size:0.9rem;color:var(--color-text-muted);line-height:1.6;margin-bottom:8px;"></p>
+    <div id="preview-modal-format" style="font-size:0.8rem;color:var(--color-text-muted);margin-bottom:20px;"></div>
+    <div class="modal-footer">
+      <button class="btn btn--ghost" onclick="closePreview()">Fechar</button>
+      <button class="btn btn--primary" id="preview-use-btn">Usar Este Template</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="assets/js/app.js"></script>
+<script>
+let activeObj = 'all', activeFmt = 'all', searchQuery = '';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const user = AquiAds.Auth.getUser();
+  document.getElementById('user-name').textContent   = user.name || 'Usuário';
+  document.getElementById('user-avatar').textContent = (user.name||'U')[0].toUpperCase();
+  renderTemplates();
+  document.getElementById('search-input').addEventListener('input', AquiAds.Utils.debounce(e => { searchQuery = e.target.value.toLowerCase(); renderTemplates(); }, 200));
+});
+
+const objLabels = { awareness:'Awareness', trafego:'Tráfego', conversao:'Conversão', promocao:'Promoção', lancamento:'Lançamento' };
+
+function filterObj(btn) {
+  document.querySelectorAll('#obj-filters .filter-pill').forEach(b => b.classList.remove('filter-pill--active'));
+  btn.classList.add('filter-pill--active');
+  activeObj = btn.dataset.obj;
+  renderTemplates();
+}
+function filterFmt(btn) {
+  document.querySelectorAll('#fmt-filters .filter-pill').forEach(b => b.classList.remove('filter-pill--active'));
+  btn.classList.add('filter-pill--active');
+  activeFmt = btn.dataset.fmt;
+  renderTemplates();
+}
+
+function renderTemplates() {
+  let list = AquiAds.Templates;
+  if (activeObj !== 'all') list = list.filter(t => t.objective === activeObj);
+  if (activeFmt !== 'all') {
+    list = list.filter(t => {
+      const fmt = AquiAds.Formats.find(f => f.id === t.format);
+      return fmt && fmt.category === activeFmt;
+    });
+  }
+  if (searchQuery) list = list.filter(t => t.name.toLowerCase().includes(searchQuery) || (t.description||'').toLowerCase().includes(searchQuery));
+
+  const grid  = document.getElementById('templates-grid');
+  const empty = document.getElementById('templates-empty');
+  if (!list.length) { grid.innerHTML = ''; empty.style.display = 'flex'; return; }
+  empty.style.display = 'none';
+
+  grid.innerHTML = list.map(t => {
+    const fmt = AquiAds.Formats.find(f => f.id === t.format) || { name:'?', category:'?' };
+    const objLabel = objLabels[t.objective] || t.objective;
+    const ratio = fmt.height / fmt.width;
+    const pw = 220, ph = Math.round(pw * ratio);
+    const previewH = Math.min(180, Math.max(80, ph));
+    return `
+      <div class="template-card">
+        <div class="template-preview" style="height:${previewH}px;" onclick="openPreview('${t.id}')">
+          ${buildTemplateMockup(t, fmt, pw, previewH)}
+        </div>
+        <div class="template-info">
+          <div class="template-name">${t.name}</div>
+          <div class="template-badges">
+            <span class="badge badge--orange">${objLabel}</span>
+            <span class="badge badge--gray">${fmt.category}</span>
+            <span class="badge badge--blue" style="font-size:0.7rem;">${fmt.width}×${fmt.height}</span>
+          </div>
+          <p class="template-desc">${t.description || ''}</p>
+          <div class="template-actions">
+            <button class="btn btn--primary btn--sm w-full" onclick="useTemplate('${t.id}')">Usar Template</button>
+            <button class="btn btn--ghost btn--sm" onclick="openPreview('${t.id}')">Preview</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function buildTemplateMockup(tmpl, fmt, w, h) {
+  const scaleX = w / fmt.width, scaleY = h / fmt.height;
+  const bgEl = tmpl.elements.find(e => e.type === 'rect' && e.x === 0 && e.y === 0);
+  const bgColor = bgEl?.styles?.backgroundColor || '#F5F5F5';
+  let inner = `<div style="width:100%;height:100%;position:relative;background:${tmpl.thumb||bgColor};overflow:hidden;">`;
+  [...tmpl.elements].sort((a,b)=>a.zIndex-b.zIndex).forEach(el => {
+    const x  = (el.x/100)*w, y  = (el.y/100)*h;
+    const ew = (el.w/100)*w, eh = (el.h/100)*h;
+    const st = el.styles || {};
+    if (el.type === 'text' || el.type === 'logo') {
+      const fs = Math.max(6, Math.round(parseFloat(st.fontSize||'14') * scaleX));
+      inner += `<div style="position:absolute;left:${x}px;top:${y}px;width:${ew}px;height:${eh}px;
+        color:${st.color||'#fff'};font-size:${fs}px;font-weight:${st.fontWeight||'600'};
+        font-family:Inter,sans-serif;line-height:1.2;overflow:hidden;white-space:pre-wrap;
+        display:flex;align-items:center;padding:2px 4px;
+        text-align:${st.textAlign||'left'};">${el.content||''}</div>`;
+    } else if (el.type === 'rect' || el.type === 'circle') {
+      if (el.x === 0 && el.y === 0 && el.w === 100 && el.h === 100) return;
+      inner += `<div style="position:absolute;left:${x}px;top:${y}px;width:${ew}px;height:${eh}px;
+        background:${st.backgroundColor||'rgba(255,255,255,0.2)'};
+        border-radius:${st.borderRadius||'0'};
+        display:flex;align-items:center;justify-content:center;
+        color:${st.color||'#fff'};font-size:${Math.max(5,Math.round(parseFloat(st.fontSize||'12')*scaleX))}px;
+        font-weight:700;font-family:Inter,sans-serif;overflow:hidden;">${el.content||''}</div>`;
+    }
+  });
+  inner += '</div>';
+  return inner;
+}
+
+function useTemplate(id) {
+  AquiAds.Router.goTo('editor.html', { template: id });
+}
+
+function openPreview(id) {
+  const tmpl = AquiAds.Templates.find(t => t.id === id);
+  if (!tmpl) return;
+  const fmt = AquiAds.Formats.find(f => f.id === tmpl.format) || { name:'?', category:'?', width:400, height:300 };
+  document.getElementById('preview-modal-title').textContent = tmpl.name;
+  document.getElementById('preview-modal-desc').textContent  = tmpl.description || '';
+  document.getElementById('preview-modal-format').textContent = `Formato: ${fmt.name} · ${fmt.width}×${fmt.height}px · ${fmt.category}`;
+  document.getElementById('preview-modal-badges').innerHTML  = `
+    <span class="badge badge--orange">${objLabels[tmpl.objective]||tmpl.objective}</span>
+    <span class="badge badge--gray">${fmt.category}</span>`;
+  document.getElementById('preview-use-btn').onclick = () => { closePreview(); useTemplate(id); };
+
+  const maxW = 480, ratio = fmt.height/fmt.width;
+  const pw = Math.min(maxW, fmt.width), ph = Math.round(pw * ratio);
+  document.getElementById('preview-modal-canvas').innerHTML = buildTemplateMockup(tmpl, fmt, pw, Math.min(360, ph));
+  document.getElementById('preview-modal-canvas').style.width = pw + 'px';
+
+  document.getElementById('preview-modal-overlay').classList.add('modal-overlay--open');
+}
+function closePreview() {
+  document.getElementById('preview-modal-overlay').classList.remove('modal-overlay--open');
+}
+document.getElementById('preview-modal-overlay').addEventListener('click', e => { if (e.target===e.currentTarget) closePreview(); });
+</script>
+</body>
+</html>

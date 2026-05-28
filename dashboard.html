@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel — AquiAds</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+    .notif-list  { display:flex; flex-direction:column; gap:8px; }
+    .notif-item  { display:flex; align-items:flex-start; gap:12px; padding:12px; border-radius:var(--radius-md); background:var(--color-bg); border:1px solid var(--color-gray-light); }
+    .notif-icon  { font-size:1.2rem; flex-shrink:0; }
+    .notif-msg   { font-size:0.875rem; line-height:1.5; }
+    .notif-time  { font-size:0.75rem; color:var(--color-text-muted); }
+    .notif-item--unread { background:rgba(255,107,0,0.04); border-color:rgba(255,107,0,0.2); }
+    .campaign-row td:first-child { font-weight:600; }
+    .section-tabs { margin-bottom:20px; }
+    @media(max-width:1024px){ .stats-grid{grid-template-columns:repeat(2,1fr);} }
+    @media(max-width:640px){  .stats-grid{grid-template-columns:1fr 1fr;} }
+  </style>
+</head>
+<body>
+<div id="toast-container"></div>
+
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="3" fill="white"/><path d="M6 14L10 6L14 14" stroke="#FF6B00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="sidebar-logo-text">Aqui<span>Ads</span></span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Menu</div>
+      </div>
+      <a href="dashboard.html" class="nav-link nav-link--active">
+        <svg viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="templates.html" class="nav-link">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 3h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm0 1v12h12V4H4zm2 2h3v3H6V6zm5 0h3v3h-3V6zM6 11h8v1H6v-1zm0 2.5h8v1H6v-1z"/></svg>
+        <span>Templates</span>
+      </a>
+      <a href="editor.html" class="nav-link">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+        <span>Novo Criativo</span>
+      </a>
+      <div style="margin: 8px 12px;"></div>
+      <div class="nav-section">
+        <div class="nav-section-label">Conta</div>
+      </div>
+      <a href="#" class="nav-link" id="nav-logout" onclick="AquiAds.Auth.logout();return false;">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h7a1 1 0 1 0 0-2H4V5h6a1 1 0 1 0 0-2H3zm11.293 4.293a1 1 0 0 1 1.414 0l3 3a1 1 0 0 1 0 1.414l-3 3a1 1 0 0 1-1.414-1.414L15.586 11H9a1 1 0 1 1 0-2h6.586l-1.293-1.293a1 1 0 0 1 0-1.414z"/></svg>
+        <span>Sair</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="user-avatar">U</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="user-name">Usuário</div>
+          <div class="sidebar-user-plan">
+            <span class="badge badge--orange" style="font-size:0.65rem;padding:2px 7px;">Grátis</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <header class="topbar">
+      <span class="topbar-title" id="topbar-greeting">Olá 👋</span>
+      <div class="topbar-actions">
+        <div class="search-input-wrap">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/></svg>
+          <input type="text" class="search-input" placeholder="Buscar criativos…" id="search-input">
+        </div>
+        <button class="notif-btn" id="notif-btn" data-tooltip="Notificações" onclick="toggleNotifications()">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
+          <span class="notif-badge" id="notif-badge" style="display:none;">0</span>
+        </button>
+        <a href="editor.html" class="btn btn--primary btn--sm">+ Novo Criativo</a>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <!-- STATS -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:rgba(255,107,0,0.1);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#FF6B00"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/></svg>
+          </div>
+          <div class="stat-card-value" id="stat-total">0</div>
+          <div class="stat-card-label">Criativos criados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:rgba(255,107,0,0.1);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#FF8C00"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg>
+          </div>
+          <div class="stat-card-value" id="stat-review">0</div>
+          <div class="stat-card-label">Em aprovação</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:rgba(34,197,94,0.1);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#22C55E"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
+          </div>
+          <div class="stat-card-value" id="stat-approved">0</div>
+          <div class="stat-card-label">Aprovados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon" style="background:rgba(59,130,246,0.1);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="#3B82F6"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+          </div>
+          <div class="stat-card-value" id="stat-campaigns">0</div>
+          <div class="stat-card-label">Campanhas</div>
+        </div>
+      </div>
+
+      <!-- CREATIVES -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="section-header">
+          <h2>Meus Criativos</h2>
+          <a href="editor.html" class="btn btn--secondary btn--sm">+ Criar novo</a>
+        </div>
+        <div class="tab-strip section-tabs" id="status-tabs">
+          <button class="tab-btn tab-btn--active" data-filter="all"      onclick="filterTab(this)">Todos</button>
+          <button class="tab-btn"                 data-filter="draft"    onclick="filterTab(this)">Rascunho</button>
+          <button class="tab-btn"                 data-filter="review"   onclick="filterTab(this)">Em revisão</button>
+          <button class="tab-btn"                 data-filter="approved" onclick="filterTab(this)">Aprovados</button>
+          <button class="tab-btn"                 data-filter="rejected" onclick="filterTab(this)">Reprovados</button>
+        </div>
+        <div class="creatives-grid" id="creatives-grid"></div>
+        <div id="creatives-empty" class="empty-state" style="display:none;">
+          <div class="empty-state-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FF6B00" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <h3>Nenhum criativo aqui ainda</h3>
+          <p>Comece escolhendo um template ou criando do zero no editor.</p>
+          <div style="display:flex;gap:10px;">
+            <a href="templates.html" class="btn btn--primary">Ver Templates</a>
+            <a href="editor.html"    class="btn btn--ghost">Editor em branco</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAMPAIGNS TABLE -->
+      <div class="card" style="margin-bottom:24px;">
+        <div class="section-header">
+          <h2>Histórico de Campanhas</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th onclick="sortTable('name')">Campanha ↕</th>
+                <th onclick="sortTable('format')">Formato ↕</th>
+                <th onclick="sortTable('status')">Status ↕</th>
+                <th onclick="sortTable('score')">Score ↕</th>
+                <th onclick="sortTable('date')">Data ↕</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="campaign-table-body"></tbody>
+          </table>
+        </div>
+        <div id="campaigns-empty" class="empty-state" style="display:none;padding:32px 20px;">
+          <p style="color:var(--color-text-muted);font-size:0.9rem;">Nenhuma campanha enviada ainda.</p>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS PANEL -->
+      <div class="card" id="notif-panel" style="display:none;margin-bottom:24px;">
+        <div class="section-header">
+          <h2>Notificações</h2>
+          <button class="btn btn--ghost btn--sm" onclick="markAllRead()">Marcar todas como lidas</button>
+        </div>
+        <div class="notif-list" id="notif-list"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+<script>
+let currentFilter = 'all', sortField = 'date', sortDir = 1;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const user = AquiAds.Auth.getUser();
+  document.getElementById('user-name').textContent     = user.name || 'Usuário';
+  document.getElementById('user-avatar').textContent   = (user.name || 'U')[0].toUpperCase();
+  document.getElementById('topbar-greeting').textContent = `Olá, ${user.name?.split(' ')[0] || 'usuário'} 👋`;
+  renderDashboard();
+  updateNotifBadge();
+  document.getElementById('search-input').addEventListener('input', AquiAds.Utils.debounce(e => {
+    renderCreatives(currentFilter, e.target.value.trim());
+  }, 250));
+});
+
+function renderDashboard() {
+  const list = AquiAds.State.getCreatives();
+  document.getElementById('stat-total').textContent     = list.length;
+  document.getElementById('stat-review').textContent    = list.filter(c=>c.status==='review').length;
+  document.getElementById('stat-approved').textContent  = list.filter(c=>c.status==='approved').length;
+  document.getElementById('stat-campaigns').textContent = list.filter(c=>c.campaign?.name).length;
+  renderCreatives('all','');
+  renderCampaignTable(list);
+}
+
+function renderCreatives(filter, query='') {
+  currentFilter = filter;
+  let list = AquiAds.State.getCreatives();
+  if (filter !== 'all') list = list.filter(c => c.status === filter);
+  if (query) list = list.filter(c => c.name.toLowerCase().includes(query.toLowerCase()));
+  const grid = document.getElementById('creatives-grid');
+  const empty = document.getElementById('creatives-empty');
+  if (!list.length) { grid.innerHTML=''; empty.style.display='flex'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = list.map(c => {
+    const fmt = AquiAds.Formats.find(f=>f.id===c.formatId) || { name:'Desconhecido', category:'?' };
+    const statusMap = { draft:'Rascunho', review:'Em revisão', approved:'Aprovado', rejected:'Reprovado' };
+    const statusClass = { draft:'draft', review:'review', approved:'approved', rejected:'rejected' };
+    const scoreClass = c.score >= 75 ? 'success' : c.score >= 50 ? 'warning' : 'error';
+    const scoreColor = { success:'#22C55E', warning:'#F59E0B', error:'#EF4444' }[scoreClass];
+    const r = 18, circ = 2*Math.PI*r;
+    const offset = circ * (1 - (c.score||0)/100);
+    return `
+      <div class="creative-card" onclick="editCreative('${c.id}')">
+        <div class="creative-thumb">
+          ${c.thumbnail
+            ? `<img src="${c.thumbnail}" alt="${c.name}">`
+            : `<div class="creative-thumb-placeholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+                <span style="font-size:0.75rem;">${fmt.name}</span>
+              </div>`}
+          <div style="position:absolute;top:10px;right:10px;">
+            <span class="status-pill status-pill--${statusClass[c.status]||'draft'}">${statusMap[c.status]||'Rascunho'}</span>
+          </div>
+        </div>
+        <div class="creative-info">
+          <div class="creative-name">${c.name}</div>
+          <div class="creative-meta">
+            <span class="badge badge--gray">${fmt.category}</span>
+            <div class="score-ring">
+              <svg viewBox="0 0 44 44" width="44" height="44">
+                <circle cx="22" cy="22" r="${r}" fill="none" stroke="#E5E5E5" stroke-width="3"/>
+                <circle cx="22" cy="22" r="${r}" fill="none" stroke="${scoreColor}" stroke-width="3" stroke-linecap="round"
+                  stroke-dasharray="${circ}" stroke-dashoffset="${offset}" transform="rotate(-90 22 22)"/>
+                <text x="22" y="22" fill="${scoreColor}" font-size="9" font-weight="700" text-anchor="middle" dominant-baseline="middle">${c.score||0}</text>
+              </svg>
+            </div>
+          </div>
+          <div class="creative-actions" onclick="event.stopPropagation()">
+            <button class="btn btn--primary btn--sm" onclick="editCreative('${c.id}')">Editar</button>
+            <button class="btn btn--ghost btn--sm" onclick="duplicateCreative('${c.id}')">Duplicar</button>
+            <button class="btn btn--ghost btn--sm" style="color:var(--color-error);" onclick="deleteCreative('${c.id}')">✕</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderCampaignTable(list) {
+  const tbody = document.getElementById('campaign-table-body');
+  const empty = document.getElementById('campaigns-empty');
+  const rows  = list.filter(c => c.campaign?.name || c.status !== 'draft');
+  if (!rows.length) { tbody.innerHTML=''; empty.style.display='flex'; return; }
+  empty.style.display = 'none';
+  const sorted = [...rows].sort((a,b) => {
+    const va = sortField==='date' ? a.updatedAt : sortField==='score' ? a.score : (a[sortField]||a.name||'');
+    const vb = sortField==='date' ? b.updatedAt : sortField==='score' ? b.score : (b[sortField]||b.name||'');
+    return String(va).localeCompare(String(vb)) * sortDir;
+  });
+  const statusMap  = { draft:'Rascunho', review:'Em revisão', approved:'Aprovado', rejected:'Reprovado' };
+  const statusClass = { draft:'gray', review:'orange', approved:'green', rejected:'red' };
+  tbody.innerHTML = sorted.map(c => {
+    const fmt = AquiAds.Formats.find(f=>f.id===c.formatId);
+    return `<tr>
+      <td>${c.campaign?.name || c.name}</td>
+      <td>${fmt?.name||'-'}</td>
+      <td><span class="badge badge--${statusClass[c.status]||'gray'}">${statusMap[c.status]||'-'}</span></td>
+      <td><strong style="color:${c.score>=75?'#22C55E':c.score>=50?'#F59E0B':'#EF4444'}">${c.score||0}</strong></td>
+      <td>${AquiAds.Utils.formatDate(c.updatedAt||c.createdAt)}</td>
+      <td>
+        <button class="btn btn--ghost btn--sm" onclick="editCreative('${c.id}')">Editar</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTab(btn) {
+  document.querySelectorAll('#status-tabs .tab-btn').forEach(b => b.classList.remove('tab-btn--active'));
+  btn.classList.add('tab-btn--active');
+  renderCreatives(btn.dataset.filter, document.getElementById('search-input').value);
+}
+
+function sortTable(field) {
+  if (sortField === field) sortDir *= -1; else { sortField = field; sortDir = 1; }
+  renderCampaignTable(AquiAds.State.getCreatives());
+}
+
+function editCreative(id) { AquiAds.Router.goTo('editor.html', { id }); }
+
+function duplicateCreative(id) {
+  const c = AquiAds.State.getCreatives().find(x => x.id === id);
+  if (!c) return;
+  const copy = AquiAds.Utils.deepClone(c);
+  copy.id = AquiAds.Utils.generateId();
+  copy.name = c.name + ' (cópia)';
+  copy.status = 'draft';
+  copy.createdAt = new Date().toISOString();
+  copy.updatedAt = copy.createdAt;
+  AquiAds.State.saveCreative(copy);
+  AquiAds.Toast.show('Criativo duplicado!', 'success');
+  renderDashboard();
+}
+
+function deleteCreative(id) {
+  if (!confirm('Excluir este criativo permanentemente?')) return;
+  AquiAds.State.deleteCreative(id);
+  AquiAds.Toast.show('Criativo excluído.', 'default');
+  renderDashboard();
+}
+
+function updateNotifBadge() {
+  const count = AquiAds.Notifications.getUnreadCount();
+  const badge = document.getElementById('notif-badge');
+  badge.style.display = count > 0 ? 'flex' : 'none';
+  badge.textContent = count;
+}
+
+function toggleNotifications() {
+  const panel = document.getElementById('notif-panel');
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderNotifications();
+}
+
+function renderNotifications() {
+  const list = AquiAds.Notifications.getAll();
+  const container = document.getElementById('notif-list');
+  if (!list.length) { container.innerHTML='<p style="color:var(--color-text-muted);font-size:0.875rem;padding:8px;">Nenhuma notificação.</p>'; return; }
+  const icons = { info:'ℹ️', success:'✅', error:'❌', warning:'⚠️' };
+  container.innerHTML = list.slice(0,10).map(n => `
+    <div class="notif-item${n.read?'':' notif-item--unread'}" onclick="AquiAds.Notifications.markRead('${n.id}');this.classList.remove('notif-item--unread');updateNotifBadge();">
+      <span class="notif-icon">${icons[n.type]||'ℹ️'}</span>
+      <div>
+        <div class="notif-msg">${n.message}</div>
+        <div class="notif-time">${AquiAds.Utils.formatDate(n.createdAt)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function markAllRead() {
+  AquiAds.Notifications.markAllRead();
+  renderNotifications();
+  updateNotifBadge();
+}
+</script>
+</body>
+</html>

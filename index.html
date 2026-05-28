@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AquiAds — Crie Anúncios Profissionais</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .landing-nav-btns { display:flex; gap:10px; align-items:center; }
+    .already-logged  { display:none; }
+    .hero-trust { display:flex; align-items:center; justify-content:center; gap:24px; flex-wrap:wrap; margin-top:28px; font-size:0.85rem; color:var(--color-text-muted); }
+    .hero-trust span { display:flex; align-items:center; gap:6px; }
+    .testimonials { padding:60px 32px; background:var(--color-bg); }
+    .testimonials h2 { text-align:center; font-size:1.75rem; font-weight:800; margin-bottom:40px; }
+    .testimonial-card { background:#fff; border-radius:var(--radius-lg); padding:24px; border:1px solid var(--color-gray-light); }
+    .testimonial-stars { color:#FF6B00; font-size:1rem; margin-bottom:12px; }
+    .testimonial-text  { font-size:0.9rem; line-height:1.7; color:var(--color-text); margin-bottom:16px; }
+    .testimonial-author { display:flex; align-items:center; gap:10px; }
+    .testimonial-avatar { width:36px; height:36px; border-radius:50%; background:var(--color-primary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.875rem; }
+    .testimonial-name   { font-weight:600; font-size:0.875rem; }
+    .testimonial-role   { font-size:0.8rem; color:var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="landing-nav">
+    <div class="landing-nav-inner">
+      <a href="index.html" style="text-decoration:none;">
+        <span class="logo-text">Aqui<span>Ads</span></span>
+      </a>
+      <div class="landing-nav-btns" id="nav-btns">
+        <button class="btn btn--ghost btn--sm" onclick="openAuthModal('login')">Entrar</button>
+        <button class="btn btn--primary btn--sm" onclick="openAuthModal('register')">Começar Grátis</button>
+      </div>
+      <div class="landing-nav-btns already-logged" id="nav-logged">
+        <a href="dashboard.html" class="btn btn--primary btn--sm">Ir para o Painel →</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <span>✦</span> Plataforma oficial Eletromidia
+    </div>
+    <h1>Crie anúncios profissionais<br>sem precisar de designer</h1>
+    <p>Do outdoor ao Instagram, a plataforma AquiAds guia sua empresa na criação de criativos validados e prontos para veiculação em qualquer mídia.</p>
+    <div class="hero-ctas">
+      <button class="btn btn--primary btn--lg" onclick="openAuthModal('register')">Criar Meu Anúncio Grátis</button>
+      <button class="btn btn--secondary btn--lg" onclick="openAuthModal('login')">Já tenho conta</button>
+    </div>
+    <div class="hero-trust">
+      <span>✓ Sem necessidade de design</span>
+      <span>✓ Validação automática</span>
+      <span>✓ OOH e Digital</span>
+      <span>✓ Aprovação rápida</span>
+    </div>
+
+    <!-- App mockup -->
+    <div class="hero-mockup">
+      <div class="hero-mockup-inner">
+        <div class="hero-mockup-bar">
+          <div class="hero-mockup-dot" style="background:#EF4444;"></div>
+          <div class="hero-mockup-dot" style="background:#F59E0B;"></div>
+          <div class="hero-mockup-dot" style="background:#22C55E;"></div>
+          <div style="flex:1;height:16px;background:#E5E5E5;border-radius:4px;margin-left:8px;"></div>
+        </div>
+        <div class="hero-mockup-content">
+          <div class="hero-mockup-sidebar">
+            <div class="hero-mockup-sidebar-item"></div>
+            <div class="hero-mockup-sidebar-item" style="height:20px;"></div>
+            <div class="hero-mockup-sidebar-item" style="height:20px;"></div>
+            <div class="hero-mockup-sidebar-item" style="height:20px;background:rgba(229,229,229,0.5);"></div>
+            <div class="hero-mockup-sidebar-item" style="height:20px;background:rgba(229,229,229,0.5);"></div>
+          </div>
+          <div class="hero-mockup-canvas-area">
+            <div class="hero-mockup-canvas-inner">
+              <div style="width:70%;height:14px;margin-bottom:10px;"></div>
+              <div style="width:90%;height:22px;margin-bottom:8px;background:rgba(255,255,255,0.95);border-radius:3px;"></div>
+              <div style="width:75%;height:10px;margin-bottom:20px;background:rgba(255,255,255,0.6);border-radius:2px;"></div>
+              <div style="width:45%;height:20px;background:#fff;border-radius:6px;"></div>
+            </div>
+          </div>
+          <div style="width:140px;display:flex;flex-direction:column;gap:10px;padding:8px;">
+            <div style="background:var(--color-bg);border-radius:6px;padding:10px;">
+              <div style="font-size:0.65rem;font-weight:700;color:var(--color-text-muted);margin-bottom:6px;">SCORE</div>
+              <div style="font-size:1.5rem;font-weight:800;color:#22C55E;">82</div>
+              <div style="font-size:0.6rem;color:var(--color-text-muted);">Nota B</div>
+            </div>
+            <div style="background:var(--color-bg);border-radius:6px;padding:10px;font-size:0.65rem;">
+              <div style="font-weight:700;margin-bottom:6px;color:var(--color-text-muted);">CHECKLIST</div>
+              <div style="color:#22C55E;margin-bottom:2px;">✓ Zona segura</div>
+              <div style="color:#22C55E;margin-bottom:2px;">✓ Contraste</div>
+              <div style="color:#F59E0B;">⚠ CTA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section class="how-it-works">
+    <div class="container">
+      <h2>Como funciona?</h2>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Escolha um Template</h3>
+          <p>Selecione um modelo pronto pelo objetivo do seu anúncio: awareness, promoção, lançamento e mais.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Personalize o Criativo</h3>
+          <p>Adicione textos, imagens e seu logo. Nosso editor visual guia você em cada passo.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Valide com IA</h3>
+          <p>Receba um score de qualidade e sugestões automáticas para melhorar o impacto do seu anúncio.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h3>Envie para Aprovação</h3>
+          <p>Com um clique, envie seu criativo para a equipe da Eletromidia. Acompanhe o status pelo painel.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORMATOS -->
+  <section class="formats-section">
+    <div class="container">
+      <h2>Todos os formatos da Eletromidia</h2>
+      <p>Crie para Digital e OOH — outdoor, metrô, aeroporto, Instagram e muito mais.</p>
+      <div class="formats-grid">
+        <div class="format-card">
+          <div class="format-preview" style="width:120px;height:42px;"></div>
+          <h4>Outdoor 14×48ft</h4>
+          <p>OOH · 1344×462px</p>
+        </div>
+        <div class="format-card">
+          <div class="format-preview" style="width:80px;height:40px;"></div>
+          <h4>Painel 6×3m</h4>
+          <p>OOH · 1200×600px</p>
+        </div>
+        <div class="format-card">
+          <div class="format-preview" style="width:100px;height:56px;"></div>
+          <h4>Metrô SP / RJ</h4>
+          <p>OOH · 1920×1080px</p>
+        </div>
+        <div class="format-card">
+          <div class="format-preview" style="width:60px;height:60px;"></div>
+          <h4>Feed Instagram</h4>
+          <p>Digital · 1080×1080px</p>
+        </div>
+        <div class="format-card">
+          <div class="format-preview" style="width:34px;height:60px;"></div>
+          <h4>Story 1080×1920</h4>
+          <p>Digital · Stories</p>
+        </div>
+        <div class="format-card">
+          <div class="format-preview" style="width:90px;height:30px;"></div>
+          <h4>Leaderboard 728×90</h4>
+          <p>Digital · Banner</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPOIMENTOS -->
+  <section class="testimonials">
+    <div class="container">
+      <h2>O que dizem nossos clientes</h2>
+      <div class="grid-3">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Nunca imaginei que conseguiria criar um outdoor profissional sozinha. O AquiAds me guiou em cada etapa!"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">A</div>
+            <div><div class="testimonial-name">Ana Paula</div><div class="testimonial-role">Confeitaria Artesanal · SP</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"O score de qualidade me ajudou a entender o que faltava no meu anúncio. Aprovado na primeira tentativa!"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">R</div>
+            <div><div class="testimonial-name">Ricardo</div><div class="testimonial-role">Loja de Roupas · RJ</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Usamos para o lançamento do nosso restaurante. A mídia no Metrô SP ficou incrível e sem precisar de agência!"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">M</div>
+            <div><div class="testimonial-name">Marina</div><div class="testimonial-role">Restaurante · SP</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Comece grátis agora</h2>
+      <p>Crie seu primeiro anúncio em minutos. Sem cartão de crédito.</p>
+      <div class="hero-ctas">
+        <button class="btn btn--primary btn--lg" onclick="openAuthModal('register')">Criar Minha Conta</button>
+        <button class="btn btn--secondary btn--lg" onclick="openAuthModal('login')">Já tenho conta</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="landing-footer">
+    <p>© 2025 AquiAds · Eletromidia · <a href="#">Termos de Uso</a> · <a href="#">Privacidade</a></p>
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="auth-modal-overlay">
+    <div class="modal modal--sm">
+      <div class="modal-header">
+        <div>
+          <div class="tab-strip" style="border:none;margin:0 0 4px;">
+            <button class="tab-btn tab-btn--active" id="tab-login-btn"  onclick="switchTab('login')">Entrar</button>
+            <button class="tab-btn"                 id="tab-reg-btn"    onclick="switchTab('register')">Cadastro</button>
+          </div>
+          <p style="font-size:0.8rem;color:var(--color-text-muted);" id="auth-subtitle">Acesse seu painel AquiAds</p>
+        </div>
+        <button class="modal-close" onclick="closeAuthModal()">✕</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input type="email" class="form-input" id="login-email" placeholder="seu@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input type="password" class="form-input" id="login-password" placeholder="Mínimo 6 caracteres" required>
+          </div>
+          <div id="login-error" class="form-error" style="display:none;"></div>
+          <button type="submit" class="btn btn--primary w-full">Entrar no AquiAds</button>
+          <p style="text-align:center;font-size:0.8rem;color:var(--color-text-muted);">
+            Não tem conta? <a href="#" onclick="switchTab('register');return false;">Cadastre-se grátis</a>
+          </p>
+        </div>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="register-form" style="display:none;" onsubmit="handleRegister(event)">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="form-group">
+            <label class="form-label">Nome completo <span class="required">*</span></label>
+            <input type="text" class="form-input" id="reg-name" placeholder="Seu nome" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mail <span class="required">*</span></label>
+            <input type="email" class="form-input" id="reg-email" placeholder="seu@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Segmento</label>
+            <select class="form-select" id="reg-segment">
+              <option value="Varejo">Varejo</option>
+              <option value="Gastronomia">Gastronomia</option>
+              <option value="Saúde e Beleza">Saúde e Beleza</option>
+              <option value="Educação">Educação</option>
+              <option value="Serviços">Serviços</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha <span class="required">*</span></label>
+            <input type="password" class="form-input" id="reg-password" placeholder="Mínimo 6 caracteres" required>
+          </div>
+          <div id="reg-error" class="form-error" style="display:none;"></div>
+          <button type="submit" class="btn btn--primary w-full">Criar Minha Conta Grátis</button>
+          <p style="text-align:center;font-size:0.75rem;color:var(--color-text-muted);">
+            Ao criar conta você aceita nossos <a href="#">Termos de Uso</a>.
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="assets/js/app.js"></script>
+  <script>
+    // Check already logged in
+    if (AquiAds.Auth.isLoggedIn()) {
+      document.getElementById('nav-btns').style.display = 'none';
+      document.getElementById('nav-logged').style.display = 'flex';
+    }
+
+    function openAuthModal(tab) {
+      if (AquiAds.Auth.isLoggedIn()) { window.location.href = 'dashboard.html'; return; }
+      document.getElementById('auth-modal-overlay').classList.add('modal-overlay--open');
+      switchTab(tab);
+    }
+    function closeAuthModal() {
+      document.getElementById('auth-modal-overlay').classList.remove('modal-overlay--open');
+    }
+    function switchTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('login-form').style.display    = isLogin ? 'block' : 'none';
+      document.getElementById('register-form').style.display = isLogin ? 'none'  : 'block';
+      document.getElementById('tab-login-btn').className = 'tab-btn' + (isLogin ? ' tab-btn--active' : '');
+      document.getElementById('tab-reg-btn').className   = 'tab-btn' + (!isLogin? ' tab-btn--active' : '');
+      document.getElementById('auth-subtitle').textContent = isLogin ? 'Acesse seu painel AquiAds' : 'Crie sua conta gratuita';
+    }
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const pass  = document.getElementById('login-password').value;
+      const res = AquiAds.Auth.login(email, pass);
+      if (res.success) { window.location.href = 'dashboard.html'; }
+      else { const err = document.getElementById('login-error'); err.textContent = res.message; err.style.display = 'block'; }
+    }
+    function handleRegister(e) {
+      e.preventDefault();
+      const res = AquiAds.Auth.register({ name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value, segment: document.getElementById('reg-segment').value });
+      if (res.success) { window.location.href = 'dashboard.html'; }
+      else { const err = document.getElementById('reg-error'); err.textContent = res.message; err.style.display = 'block'; }
+    }
+    document.getElementById('auth-modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeAuthModal(); });
+  </script>
+</body>
+</html>
