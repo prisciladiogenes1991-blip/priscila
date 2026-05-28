@@ -375,10 +375,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
 
 <script>
-// Right panel tabs
-document.querySelectorAll('.panel-tab[data-tab]').forEach(btn => {
+// Right panel tabs (scoped — left panel tabs are handled by editor.js setupPanel)
+document.querySelectorAll('.panel-right .panel-tab[data-tab]').forEach(btn => {
   btn.addEventListener('click', () => {
-    const panel = btn.closest('.editor-panel, .panel-right');
+    const panel = btn.closest('.panel-right');
+    if (!panel) return;
     panel.querySelectorAll('.panel-tab').forEach(b => b.classList.remove('tab-btn--active'));
     panel.querySelectorAll('.panel-tab-content').forEach(c => c.classList.remove('tab-content--active'));
     btn.classList.add('tab-btn--active');

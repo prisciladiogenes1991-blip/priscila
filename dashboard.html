@@ -221,7 +221,7 @@ function renderCreatives(filter, query='') {
   grid.innerHTML = list.map(c => {
     const fmt = AquiAds.Formats.find(f=>f.id===c.formatId) || { name:'Desconhecido', category:'?' };
     const statusMap = { draft:'Rascunho', review:'Em revisão', approved:'Aprovado', rejected:'Reprovado' };
-    const statusClass = { draft:'draft', review:'review', approved:'approved', rejected:'rejected' };
+    const statusClass = { draft:'gray', review:'orange', approved:'green', rejected:'red' };
     const scoreClass = c.score >= 75 ? 'success' : c.score >= 50 ? 'warning' : 'error';
     const scoreColor = { success:'#22C55E', warning:'#F59E0B', error:'#EF4444' }[scoreClass];
     const r = 18, circ = 2*Math.PI*r;

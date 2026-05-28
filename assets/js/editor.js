@@ -125,7 +125,11 @@ const Editor = {
       this.format = newFormat;
       this.state.formatId = newFormat.id;
       this.state.elements = this.state.elements.map(el => ({
-        ...el, x: el.x, y: el.y, w: el.w, h: el.h
+        ...el,
+        x: AquiAds.Utils.clamp(el.x * scaleX, 0, 95),
+        y: AquiAds.Utils.clamp(el.y * scaleY, 0, 95),
+        w: AquiAds.Utils.clamp(el.w * scaleX, 1, 100),
+        h: AquiAds.Utils.clamp(el.h * scaleY, 1, 100),
       }));
       this.setupCanvas();
       this.renderAll();
@@ -141,16 +145,19 @@ const Editor = {
       nameInput.addEventListener('input', e => { this.state.name = e.target.value; });
     }
 
-    // Panel tabs
-    document.querySelectorAll('.panel-tab').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.panel-tab').forEach(b => b.classList.remove('tab-btn--active'));
-        document.querySelectorAll('.panel-tab-content').forEach(c => c.classList.remove('tab-content--active'));
-        btn.classList.add('tab-btn--active');
-        const target = document.getElementById('tab-' + btn.dataset.tab);
-        if (target) target.classList.add('tab-content--active');
+    // Left panel tabs only (scoped to .panel-left)
+    const leftPanel = document.querySelector('.panel-left');
+    if (leftPanel) {
+      leftPanel.querySelectorAll('.panel-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          leftPanel.querySelectorAll('.panel-tab').forEach(b => b.classList.remove('tab-btn--active'));
+          leftPanel.querySelectorAll('.panel-tab-content').forEach(c => c.classList.remove('tab-content--active'));
+          btn.classList.add('tab-btn--active');
+          const target = document.getElementById('tab-' + btn.dataset.tab);
+          if (target) target.classList.add('tab-content--active');
+        });
       });
-    });
+    }
 
     // Add element buttons
     document.querySelectorAll('.element-btn').forEach(btn => {
@@ -338,7 +345,7 @@ const Editor = {
       if (!div.classList.contains('editing')) div.textContent = elData.content || '';
     } else if (elData.type === 'image' && elData.content) {
       div.innerHTML = `<img src="${elData.content}" style="width:100%;height:100%;object-fit:${st.objectFit||'cover'};border-radius:${st.borderRadius||'0'};display:block;" alt="">`;
-    } else if (elData.type === 'logo' && !elData.content.startsWith('data:')) {
+    } else if (elData.type === 'logo' && !(elData.content || '').startsWith('data:')) {
       div.style.color       = st.color      || '#FF6B00';
       div.style.fontSize    = Math.max(6, parseFloat(st.fontSize||'12') * s) + 'px';
       div.style.fontWeight  = st.fontWeight || '700';
@@ -677,14 +684,17 @@ const Editor = {
       if (textColor && el.styles.color)      textColor.value = this.rgbToHex(el.styles.color) || '#1A1A1A';
       if (textAlign && el.styles.textAlign)  textAlign.value = el.styles.textAlign;
     }
-    // Switch to text tab if text element
+    // Switch to text tab if text element (scoped to left panel only)
     if (el.type === 'text') {
-      document.querySelectorAll('.panel-tab').forEach(b => b.classList.remove('tab-btn--active'));
-      document.querySelectorAll('.panel-tab-content').forEach(c => c.classList.remove('tab-content--active'));
-      const txtTab = document.querySelector('.panel-tab[data-tab="text"]');
-      const txtContent = document.getElementById('tab-text');
-      if (txtTab) txtTab.classList.add('tab-btn--active');
-      if (txtContent) txtContent.classList.add('tab-content--active');
+      const leftPanel = document.querySelector('.panel-left');
+      if (leftPanel) {
+        leftPanel.querySelectorAll('.panel-tab').forEach(b => b.classList.remove('tab-btn--active'));
+        leftPanel.querySelectorAll('.panel-tab-content').forEach(c => c.classList.remove('tab-content--active'));
+        const txtTab = leftPanel.querySelector('.panel-tab[data-tab="text"]');
+        const txtContent = document.getElementById('tab-text');
+        if (txtTab) txtTab.classList.add('tab-btn--active');
+        if (txtContent) txtContent.classList.add('tab-content--active');
+      }
     }
   },
 
@@ -785,12 +795,7 @@ const Editor = {
   getElementById(id) { return this.state.elements.find(e => e.id === id); },
   getSelected()      { return this.getElementById(this.selectedId); },
 
-  triggerValidation: AquiAds.Utils ? AquiAds.Utils.debounce(function() {
-    if (!Editor.state || !Editor.format) return;
-    const results = AquiAds.Validator.validate(Editor.state, Editor.format);
-    AquiAds.Validator.renderResults(results, document.getElementById('validation-strip'), document.getElementById('quality-badge'));
-    AquiAds.Validator.highlightViolations(results.checks, document.getElementById('canvas-stage'));
-  }, 300) : function() {},
+  triggerValidation: function() {},
 };
 
 /* Rebind triggerValidation after AquiAds.Utils is ready */
