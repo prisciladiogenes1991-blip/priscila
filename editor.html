@@ -33,6 +33,80 @@
     .specs-label { color:var(--color-text-muted); }
     .specs-value { font-weight:600; color:var(--color-text); }
 
+    /* ===== OOH CONTEXT PREVIEW ===== */
+    .ooh-context-selector { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+    .ooh-ctx-btn {
+      padding:5px 10px; border-radius:100px; font-size:0.75rem; font-weight:500;
+      border:1.5px solid var(--color-gray-light); background:#fff;
+      color:var(--color-text-muted); cursor:pointer; transition:var(--transition);
+    }
+    .ooh-ctx-btn:hover { border-color:var(--color-primary); color:var(--color-primary); }
+    .ooh-ctx-btn.active { background:var(--color-primary); border-color:var(--color-primary); color:#fff; }
+
+    .ooh-preview-scene {
+      border-radius:var(--radius-md); overflow:hidden; position:relative;
+      height:200px; margin-bottom:12px; background:#87CEEB;
+    }
+    /* Elevator */
+    .ctx-elevator {
+      background:linear-gradient(180deg,#C8D6E5 0%,#B0C4D8 100%);
+    }
+    .ctx-elevator .ctx-floor { position:absolute; bottom:0; left:0; right:0; height:28px; background:#8FA3B5; }
+    .ctx-elevator .ctx-panel { position:absolute; right:10px; top:16px; bottom:36px; width:36px; background:#7A8D9E; border-radius:3px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
+    .ctx-elevator .ctx-dot   { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.45); }
+    .ctx-screen-wrap {
+      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      background:#222; border-radius:5px; border:3px solid #111;
+      box-shadow:0 4px 16px rgba(0,0,0,0.35); overflow:hidden;
+    }
+    .ctx-screen-content {
+      background:linear-gradient(135deg,#FF6B00,#FF8C00);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:4px; padding:8px; width:100%; height:100%;
+    }
+    .ctx-screen-line { background:rgba(255,255,255,0.9); border-radius:2px; }
+
+    /* Shelter */
+    .ctx-shelter { background:linear-gradient(180deg,#87CEEB 0%,#98D4E8 60%,#7DAA6E 100%); }
+    .ctx-shelter .ctx-road { position:absolute; bottom:0; left:0; right:0; height:22px; background:#667; border-top:2px dashed rgba(255,255,255,0.35); }
+    .ctx-shelter .ctx-roof { position:absolute; left:30px; right:30px; top:18px; height:10px; background:#555; border-radius:2px 2px 0 0; }
+    .ctx-shelter .ctx-post-l { position:absolute; left:34px; top:28px; width:5px; bottom:22px; background:#666; }
+    .ctx-shelter .ctx-post-r { position:absolute; right:34px; top:28px; width:5px; bottom:22px; background:#666; }
+
+    /* Outdoor */
+    .ctx-outdoor { background:linear-gradient(180deg,#87CEEB 0%,#6BB5D6 50%,#7DAA6E 100%); }
+    .ctx-outdoor .ctx-pole { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); width:7px; height:90px; background:#555; }
+    .ctx-outdoor .ctx-ground { position:absolute; bottom:0; left:0; right:0; height:28px; background:#7DAA6E; }
+    .ctx-outdoor-board {
+      position:absolute; top:14px; left:50%; transform:translateX(-50%);
+      background:#222; border:4px solid #111; border-radius:3px; overflow:hidden;
+      box-shadow:0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    /* Shopping */
+    .ctx-shopping { background:linear-gradient(180deg,#F0E8DC 0%,#E8D8C4 100%); }
+    .ctx-shopping .ctx-tiles { position:absolute; bottom:0; left:0; right:0; height:36px; background:repeating-linear-gradient(90deg,#D4C4B0 0,#D4C4B0 48px,#C8B8A4 48px,#C8B8A4 50px); border-top:1px solid #BCA898; }
+    .ctx-shopping .ctx-screen-wrap { border-radius:6px; border:4px solid #333; }
+
+    .ooh-ctx-label { font-size:0.75rem; color:var(--color-text-muted); text-align:center; line-height:1.4; }
+
+    /* ===== SCORE PANEL IMPROVED ===== */
+    .score-cta-box {
+      margin-top:16px; padding:14px; border-radius:var(--radius-md);
+      background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2);
+      display:none; /* shown by JS when score < 50 */
+    }
+    .score-cta-box p { font-size:0.8rem; color:var(--color-text-muted); margin-bottom:10px; line-height:1.5; }
+
+    /* ===== CONTRATAR CRIAÇÃO MODAL ===== */
+    .hire-modal-body { text-align:center; padding:8px 0 16px; }
+    .hire-modal-icon { font-size:3rem; margin-bottom:12px; }
+    .hire-modal-body h4 { font-size:1.125rem; font-weight:700; margin-bottom:8px; }
+    .hire-modal-body p { font-size:0.9rem; color:var(--color-text-muted); line-height:1.6; max-width:340px; margin:0 auto 20px; }
+    .hire-benefits { display:flex; flex-direction:column; gap:8px; text-align:left; margin-bottom:20px; }
+    .hire-benefit { display:flex; align-items:center; gap:10px; font-size:0.875rem; padding:8px 12px; background:var(--color-bg); border-radius:var(--radius-sm); }
+    .hire-benefit-icon { width:20px; height:20px; border-radius:50%; background:rgba(255,107,0,0.12); color:var(--color-primary); display:flex; align-items:center; justify-content:center; font-size:0.7rem; flex-shrink:0; }
+
     @media(max-width:900px) {
       .editor-layout { grid-template-columns: 220px 1fr; }
       .panel-right   { display:none; }
@@ -78,7 +152,7 @@
       <strong style="color:var(--color-gray-mid)">—</strong><span>/100</span>
     </div>
     <div class="editor-divider"></div>
-    <button class="toolbar-btn" data-tooltip="Exportar PNG" data-export="png" title="Exportar PNG">
+    <button class="toolbar-btn" data-export="png" data-tooltip="Exportar PNG" title="Exportar PNG">
       <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/></svg>
     </button>
     <button class="btn btn--ghost btn--sm" id="btn-save" data-tooltip="Salvar rascunho">Salvar</button>
@@ -184,7 +258,7 @@
           </div>
         </div>
         <div style="font-size:0.78rem;color:var(--color-text-muted);margin-top:6px;line-height:1.5;">
-          💡 Dica: dê dois cliques no texto no canvas para editá-lo diretamente.
+          Dica: dê dois cliques no texto no canvas para editá-lo diretamente.
         </div>
       </div>
 
@@ -259,12 +333,13 @@
     </div>
   </section>
 
-  <!-- RIGHT PANEL — Layers + Specs -->
+  <!-- RIGHT PANEL — Layers + Score + Specs + Contexto -->
   <aside class="editor-panel editor-panel-right panel-right">
     <div style="border-bottom:1px solid var(--color-gray-light);">
       <div class="panel-tabs">
         <button class="panel-tab tab-btn--active" data-tab="layers">Camadas</button>
         <button class="panel-tab" data-tab="score">Score</button>
+        <button class="panel-tab" data-tab="contexto">Contexto</button>
         <button class="panel-tab" data-tab="specs">Specs</button>
       </div>
     </div>
@@ -273,6 +348,7 @@
       <div class="panel-tab-content tab-content--active" id="tab-layers">
         <div id="layers-list" style="min-height:60px;"></div>
       </div>
+
       <!-- SCORE TAB -->
       <div class="panel-tab-content" id="tab-score">
         <div class="score-panel">
@@ -283,9 +359,119 @@
             </div>
             <div id="score-ring-container"></div>
           </div>
+
+          <!-- Score interpretation guide -->
+          <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;" id="score-legend">
+            <span style="font-size:0.7rem;background:#DCFCE7;color:#15803D;padding:2px 7px;border-radius:100px;font-weight:600;">90–100 A</span>
+            <span style="font-size:0.7rem;background:#F0FDF4;color:#16A34A;padding:2px 7px;border-radius:100px;font-weight:600;">75–89 B</span>
+            <span style="font-size:0.7rem;background:#FEF3C7;color:#B45309;padding:2px 7px;border-radius:100px;font-weight:600;">60–74 C</span>
+            <span style="font-size:0.7rem;background:#FEE2E2;color:#DC2626;padding:2px 7px;border-radius:100px;font-weight:600;">&lt;60 D/F</span>
+          </div>
+
           <div class="score-checks" id="score-checks"></div>
+
+          <!-- Contratar Criação CTA — shown when score < 50 -->
+          <div class="score-cta-box" id="score-hire-cta">
+            <p>Score baixo? Nossos designers criam um criativo profissional para você em até 24h.</p>
+            <button class="btn btn--secondary w-full btn--sm" onclick="openHireModal()">
+              Contratar Criação
+            </button>
+          </div>
         </div>
       </div>
+
+      <!-- CONTEXTO TAB — OOH environment preview -->
+      <div class="panel-tab-content" id="tab-contexto">
+        <div style="font-size:0.78rem;color:var(--color-text-muted);margin-bottom:12px;line-height:1.5;">
+          Veja como seu criativo aparece no ambiente real de veiculação.
+        </div>
+
+        <!-- Context selector -->
+        <div class="ooh-context-selector">
+          <button class="ooh-ctx-btn active" data-ctx="elevator" onclick="setOohCtx(this,'elevator')">Elevador</button>
+          <button class="ooh-ctx-btn" data-ctx="shelter" onclick="setOohCtx(this,'shelter')">Abrigo</button>
+          <button class="ooh-ctx-btn" data-ctx="outdoor" onclick="setOohCtx(this,'outdoor')">Outdoor</button>
+          <button class="ooh-ctx-btn" data-ctx="shopping" onclick="setOohCtx(this,'shopping')">Shopping</button>
+        </div>
+
+        <!-- Scene: Elevator (default) -->
+        <div class="ooh-preview-scene ctx-elevator" id="ctx-scene-elevator">
+          <div class="ctx-floor"></div>
+          <div class="ctx-panel">
+            <div class="ctx-dot"></div><div class="ctx-dot"></div>
+            <div class="ctx-dot"></div><div class="ctx-dot"></div>
+          </div>
+          <div class="ctx-screen-wrap" style="width:120px;height:80px;">
+            <div class="ctx-screen-content">
+              <div class="ctx-screen-line" style="width:80%;height:8px;"></div>
+              <div class="ctx-screen-line" style="width:90%;height:14px;margin:3px 0;"></div>
+              <div class="ctx-screen-line" style="width:55%;height:6px;margin-bottom:8px;"></div>
+              <div style="background:rgba(255,255,255,0.25);border-radius:3px;padding:2px 10px;">
+                <div class="ctx-screen-line" style="width:44px;height:5px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scene: Bus shelter -->
+        <div class="ooh-preview-scene ctx-shelter" id="ctx-scene-shelter" style="display:none;">
+          <div class="ctx-road"></div>
+          <div class="ctx-roof"></div>
+          <div class="ctx-post-l"></div>
+          <div class="ctx-post-r"></div>
+          <div class="ctx-screen-wrap" style="width:100px;height:130px;position:absolute;left:50%;top:28px;transform:translateX(-50%);">
+            <div class="ctx-screen-content">
+              <div class="ctx-screen-line" style="width:80%;height:9px;"></div>
+              <div class="ctx-screen-line" style="width:70%;height:7px;margin:4px 0;"></div>
+              <div class="ctx-screen-line" style="width:60%;height:5px;margin-bottom:10px;"></div>
+              <div style="background:rgba(255,255,255,0.25);border-radius:3px;padding:3px 10px;">
+                <div class="ctx-screen-line" style="width:44px;height:5px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scene: Outdoor -->
+        <div class="ooh-preview-scene ctx-outdoor" id="ctx-scene-outdoor" style="display:none;">
+          <div class="ctx-ground"></div>
+          <div class="ctx-pole"></div>
+          <div class="ctx-outdoor-board" style="width:200px;height:76px;">
+            <div class="ctx-screen-content">
+              <div class="ctx-screen-line" style="width:85%;height:11px;"></div>
+              <div class="ctx-screen-line" style="width:70%;height:7px;margin:4px 0;"></div>
+              <div style="background:rgba(255,255,255,0.25);border-radius:3px;padding:2px 8px;">
+                <div class="ctx-screen-line" style="width:50px;height:5px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scene: Shopping -->
+        <div class="ooh-preview-scene ctx-shopping" id="ctx-scene-shopping" style="display:none;">
+          <div class="ctx-tiles"></div>
+          <div class="ctx-screen-wrap" style="width:100px;height:100px;position:absolute;top:30px;left:50%;transform:translateX(-50%);">
+            <div class="ctx-screen-content">
+              <div class="ctx-screen-line" style="width:80%;height:10px;"></div>
+              <div class="ctx-screen-line" style="width:65%;height:7px;margin:4px 0;"></div>
+              <div style="background:rgba(255,255,255,0.25);border-radius:3px;padding:3px 10px;">
+                <div class="ctx-screen-line" style="width:40px;height:5px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ooh-ctx-label" id="ooh-ctx-label" style="margin-top:8px;">
+          Mídia em elevador · Alta frequência · Audiência captiva
+        </div>
+
+        <div style="margin-top:16px;padding:12px;background:rgba(255,107,0,0.06);border-radius:var(--radius-md);border:1px solid rgba(255,107,0,0.15);">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--color-primary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;">Dica de contexto</div>
+          <div style="font-size:0.78rem;color:var(--color-text-muted);line-height:1.5;" id="ooh-ctx-tip">
+            Em elevadores, você tem 15–30s de atenção. Use mensagem direta, fonte grande e CTA claro.
+          </div>
+        </div>
+      </div>
+
       <!-- SPECS TAB -->
       <div class="panel-tab-content" id="tab-specs">
         <div class="specs-badge" id="format-specs">
@@ -362,6 +548,43 @@
   </div>
 </div>
 
+<!-- CONTRATAR CRIAÇÃO MODAL -->
+<div class="modal-overlay" id="hire-modal-overlay">
+  <div class="modal modal--sm">
+    <div class="modal-header">
+      <div><h3>Contratar Criação</h3></div>
+      <button class="modal-close" onclick="closeHireModal()">✕</button>
+    </div>
+    <div class="hire-modal-body">
+      <div class="hire-modal-icon">🎨</div>
+      <h4>Deixa com nossa equipe</h4>
+      <p>Nossos designers especializados em OOH criam um criativo profissional para você — aprovado na primeira tentativa.</p>
+      <div class="hire-benefits">
+        <div class="hire-benefit">
+          <div class="hire-benefit-icon">✓</div>
+          Designer especialista em OOH e Eletromidia
+        </div>
+        <div class="hire-benefit">
+          <div class="hire-benefit-icon">✓</div>
+          Entrega em até 24 horas úteis
+        </div>
+        <div class="hire-benefit">
+          <div class="hire-benefit-icon">✓</div>
+          1 rodada de ajustes incluída
+        </div>
+        <div class="hire-benefit">
+          <div class="hire-benefit-icon">✓</div>
+          Aprovação técnica garantida
+        </div>
+      </div>
+      <button class="btn btn--primary w-full" onclick="closeHireModal(); AquiAds.Utils.showToast('Solicitação enviada! Nossa equipe entrará em contato em breve.','success');">
+        Solicitar Criação Profissional
+      </button>
+      <button class="btn btn--ghost w-full" style="margin-top:8px;" onclick="closeHireModal()">Continuar editando</button>
+    </div>
+  </div>
+</div>
+
 <!-- AI FAB -->
 <button class="ai-fab" id="ai-fab" data-tooltip="Melhorar com IA">
   <span class="ai-fab-label">Melhorar com IA</span>
@@ -393,6 +616,50 @@ function setBg(color) {
   document.getElementById('bg-color-input').dispatchEvent(new Event('input'));
 }
 
+// OOH Context tab logic
+const oohContextData = {
+  elevator: {
+    label: 'Mídia em elevador · Alta frequência · Audiência captiva',
+    tip: 'Em elevadores, você tem 15–30s de atenção. Use mensagem direta, fonte grande e CTA claro.'
+  },
+  shelter: {
+    label: 'Abrigo de ônibus · Mídia urbana · Alta visibilidade',
+    tip: 'No abrigo, o público está esperando — até 3min de exposição. Explore mais detalhe visual.'
+  },
+  outdoor: {
+    label: 'Outdoor 14×48ft · Grande impacto visual · Visibilidade 300m',
+    tip: 'Para outdoor, menos é mais. Máximo 7 palavras. Fonte legível a 30m de distância.'
+  },
+  shopping: {
+    label: 'Shopping / Galeria · Mídia indoor · Alta permanência',
+    tip: 'Em shopping, o público tem tempo para ler. Use hierarquia clara: headline, produto, CTA.'
+  }
+};
+
+function setOohCtx(btn, ctx) {
+  document.querySelectorAll('.ooh-ctx-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('[id^="ctx-scene-"]').forEach(s => s.style.display = 'none');
+  const scene = document.getElementById('ctx-scene-' + ctx);
+  if (scene) scene.style.display = 'block';
+  const data = oohContextData[ctx] || {};
+  const lbl = document.getElementById('ooh-ctx-label');
+  const tip = document.getElementById('ooh-ctx-tip');
+  if (lbl) lbl.textContent = data.label || '';
+  if (tip) tip.textContent = data.tip || '';
+}
+
+// Hire modal
+function openHireModal() {
+  document.getElementById('hire-modal-overlay').classList.add('modal-overlay--open');
+}
+function closeHireModal() {
+  document.getElementById('hire-modal-overlay').classList.remove('modal-overlay--open');
+}
+document.getElementById('hire-modal-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeHireModal();
+});
+
 // Patch validator to also update right panel score
 const _origRenderResults = AquiAds.Validator.renderResults.bind(AquiAds.Validator);
 AquiAds.Validator.renderResults = function(results, stripEl, badgeEl) {
@@ -402,12 +669,20 @@ AquiAds.Validator.renderResults = function(results, stripEl, badgeEl) {
   const scoreGrade = document.getElementById('score-grade');
   const scoreChecks = document.getElementById('score-checks');
   const scoreRingContainer = document.getElementById('score-ring-container');
+  const scoreHireCta = document.getElementById('score-hire-cta');
+
   if (scoreBig) {
     scoreBig.textContent = results.score;
     scoreBig.className   = 'score-big score-big--' + results.grade.toLowerCase();
   }
   if (scoreGrade) scoreGrade.textContent = 'Nota ' + results.grade;
   if (scoreRingContainer) AquiAds.Utils.renderScoreRing(results.score, scoreRingContainer);
+
+  // Show/hide "Contratar Criação" CTA
+  if (scoreHireCta) {
+    scoreHireCta.style.display = (results.score > 0 && results.score < 50) ? 'block' : 'none';
+  }
+
   if (scoreChecks) {
     scoreChecks.innerHTML = results.checks.map(c => `
       <div class="score-check-item">
@@ -417,10 +692,12 @@ AquiAds.Validator.renderResults = function(results, stripEl, badgeEl) {
         <div style="flex:1;min-width:0;">
           <div class="score-check-label">${c.label}</div>
           <div class="score-check-msg">${c.message}</div>
+          ${c.status !== 'pass' && c.action ? `<div style="font-size:0.75rem;color:var(--color-primary);font-weight:600;margin-top:3px;">→ ${c.action}</div>` : ''}
         </div>
         <span class="badge badge--${c.status==='pass'?'green':c.status==='warn'?'yellow':'red'}" style="font-size:0.65rem;">${c.weight}pts</span>
       </div>`).join('');
   }
+
   // Update specs panel
   if (window.Editor && Editor.format) {
     const fmt = Editor.format;

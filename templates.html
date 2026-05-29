@@ -7,13 +7,22 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <style>
     .filters-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:6px; }
-    .format-filter { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:24px; }
-    .format-filter .filter-pill { font-size:0.78rem; padding:5px 12px; }
+    .format-filter { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+    .ctx-filter    { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:24px; }
+    .format-filter .filter-pill, .ctx-filter .filter-pill { font-size:0.78rem; padding:5px 12px; }
     .template-preview { cursor:pointer; }
+    .filter-group-label {
+      font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;
+      color:var(--color-text-muted); padding:4px 2px 2px; display:block; width:100%;
+    }
+    @media(max-width:640px) {
+      .templates-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+    }
   </style>
 </head>
 <body>
 <div id="toast-container"></div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
 <div class="app-layout">
   <!-- SIDEBAR -->
@@ -43,6 +52,11 @@
 
   <div class="main-content">
     <header class="topbar">
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+      </button>
       <span class="topbar-title">Galeria de Templates</span>
       <div class="topbar-actions">
         <div class="search-input-wrap">
@@ -70,9 +84,20 @@
 
       <!-- FORMAT FILTER -->
       <div class="format-filter" id="fmt-filters">
+        <span class="filter-group-label">Formato</span>
         <button class="filter-pill filter-pill--active" data-fmt="all"     onclick="filterFmt(this)">Todos formatos</button>
         <button class="filter-pill" data-fmt="OOH"     onclick="filterFmt(this)">OOH</button>
         <button class="filter-pill" data-fmt="Digital" onclick="filterFmt(this)">Digital</button>
+      </div>
+
+      <!-- CONTEXT FILTER (OOH environments) -->
+      <div class="ctx-filter" id="ctx-filters">
+        <span class="filter-group-label">Contexto OOH</span>
+        <button class="filter-pill filter-pill--active" data-ctx="all"      onclick="filterCtx(this)">Todos contextos</button>
+        <button class="filter-pill" data-ctx="elevador"  onclick="filterCtx(this)">Elevador</button>
+        <button class="filter-pill" data-ctx="abrigo"    onclick="filterCtx(this)">Abrigo</button>
+        <button class="filter-pill" data-ctx="outdoor"   onclick="filterCtx(this)">Outdoor</button>
+        <button class="filter-pill" data-ctx="shopping"  onclick="filterCtx(this)">Shopping</button>
       </div>
 
       <!-- GRID -->
@@ -112,7 +137,7 @@
 
 <script src="assets/js/app.js"></script>
 <script>
-let activeObj = 'all', activeFmt = 'all', searchQuery = '';
+let activeObj = 'all', activeFmt = 'all', activeCtx = 'all', searchQuery = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   const user = AquiAds.Auth.getUser();
@@ -136,6 +161,18 @@ function filterFmt(btn) {
   activeFmt = btn.dataset.fmt;
   renderTemplates();
 }
+function filterCtx(btn) {
+  document.querySelectorAll('#ctx-filters .filter-pill').forEach(b => b.classList.remove('filter-pill--active'));
+  btn.classList.add('filter-pill--active');
+  activeCtx = btn.dataset.ctx;
+  // If a specific OOH context is selected, also filter to OOH only
+  if (activeCtx !== 'all') {
+    document.querySelectorAll('#fmt-filters .filter-pill').forEach(b => b.classList.remove('filter-pill--active'));
+    const oohBtn = document.querySelector('#fmt-filters [data-fmt="OOH"]');
+    if (oohBtn) { oohBtn.classList.add('filter-pill--active'); activeFmt = 'OOH'; }
+  }
+  renderTemplates();
+}
 
 function renderTemplates() {
   let list = AquiAds.Templates;
@@ -147,6 +184,7 @@ function renderTemplates() {
     });
   }
   if (searchQuery) list = list.filter(t => t.name.toLowerCase().includes(searchQuery) || (t.description||'').toLowerCase().includes(searchQuery));
+  if (activeCtx !== 'all') list = list.filter(t => (t.context||'').toLowerCase() === activeCtx || (t.name||'').toLowerCase().includes(activeCtx) || (t.description||'').toLowerCase().includes(activeCtx));
 
   const grid  = document.getElementById('templates-grid');
   const empty = document.getElementById('templates-empty');
@@ -156,6 +194,7 @@ function renderTemplates() {
   grid.innerHTML = list.map(t => {
     const fmt = AquiAds.Formats.find(f => f.id === t.format) || { name:'?', category:'?' };
     const objLabel = objLabels[t.objective] || t.objective;
+    const ctxLabel = t.context ? t.context.charAt(0).toUpperCase() + t.context.slice(1) : '';
     const ratio = fmt.height / fmt.width;
     const pw = 220, ph = Math.round(pw * ratio);
     const previewH = Math.min(180, Math.max(80, ph));
@@ -169,7 +208,7 @@ function renderTemplates() {
           <div class="template-badges">
             <span class="badge badge--orange">${objLabel}</span>
             <span class="badge badge--gray">${fmt.category}</span>
-            <span class="badge badge--blue" style="font-size:0.7rem;">${fmt.width}×${fmt.height}</span>
+            ${ctxLabel ? `<span class="badge badge--blue" style="font-size:0.7rem;">${ctxLabel}</span>` : `<span class="badge badge--blue" style="font-size:0.7rem;">${fmt.width}×${fmt.height}</span>`}
           </div>
           <p class="template-desc">${t.description || ''}</p>
           <div class="template-actions">
@@ -238,6 +277,20 @@ function closePreview() {
   document.getElementById('preview-modal-overlay').classList.remove('modal-overlay--open');
 }
 document.getElementById('preview-modal-overlay').addEventListener('click', e => { if (e.target===e.currentTarget) closePreview(); });
+
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const isOpen = sidebar.classList.contains('sidebar--mobile-open');
+  if (isOpen) { closeSidebar(); } else {
+    sidebar.classList.add('sidebar--mobile-open');
+    overlay.classList.add('sidebar-overlay--open');
+  }
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('sidebar--mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('sidebar-overlay--open');
+}
 </script>
 </body>
 </html>

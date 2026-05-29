@@ -21,6 +21,7 @@
 </head>
 <body>
 <div id="toast-container"></div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
 <div class="app-layout">
   <!-- SIDEBAR -->
@@ -72,6 +73,11 @@
   <!-- MAIN CONTENT -->
   <div class="main-content">
     <header class="topbar">
+      <button class="hamburger-btn" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+      </button>
       <span class="topbar-title" id="topbar-greeting">Olá 👋</span>
       <div class="topbar-actions">
         <div class="search-input-wrap">
@@ -357,6 +363,21 @@ function markAllRead() {
   AquiAds.Notifications.markAllRead();
   renderNotifications();
   updateNotifBadge();
+}
+
+// Mobile sidebar toggle
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const isOpen = sidebar.classList.contains('sidebar--mobile-open');
+  if (isOpen) { closeSidebar(); } else {
+    sidebar.classList.add('sidebar--mobile-open');
+    overlay.classList.add('sidebar-overlay--open');
+  }
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('sidebar--mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('sidebar-overlay--open');
 }
 </script>
 </body>
